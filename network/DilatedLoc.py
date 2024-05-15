@@ -433,20 +433,18 @@ class LocalizationCNN_Unet_downsample_128_Unet(nn.Module):
             xyzi_est[:, 0] += 0.5 + coord[0]
             xyzi_est[:, 1] += 0.5 + coord[1]
             p = p[:,0]
-            
-            p_index = torch.where(p>threhold)
+
+            p_index = torch.where(p > 0.3)
             temp_len = len(p_index[0])
+            x = ((xyzi_est[:, 0])[p_index] + p_index[2]).unsqueeze(1)
+            #        #self.results_array[self.curindex:self.curindex + temp_len,1] = x
+            y = ((xyzi_est[:, 1])[p_index] + p_index[1]).unsqueeze(1)
 
-            self.results_array[: temp_len,0] = p_index[0] + index
-            self.results_array[: temp_len,1] = ((xyzi_est[:,0])[p_index] + p_index[2]) 
-                   #self.results_array[self.curindex:self.curindex + temp_len,1] = x
-            self.results_array[:temp_len,2] = ((xyzi_est[:,1])[p_index] + p_index[1])  
-
-            self.results_array[:temp_len,3] = (xyzi_est[:,2])[p_index] 
-            self.results_array[:temp_len,4] = (xyzi_est[:,3])[p_index]
-            self.results_array[:temp_len,5] = p[p_index]
-            
-            return self.results_array[:temp_len],temp_len
+            z = ((xyzi_est[:, 2])[p_index]).unsqueeze(1)
+            ints = ((xyzi_est[:, 3])[p_index]).unsqueeze(1)
+            pp = (p[p_index]).unsqueeze(1)
+            findex = (p_index[0] + index).unsqueeze(1)
+            return [findex, x, y, z, ints, pp], temp_len
             
         return p, xyzi_est, xyzi_sig  
 
